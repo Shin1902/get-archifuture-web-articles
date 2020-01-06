@@ -1,3 +1,5 @@
+# coding: utf-8
+
 from matplotlib.font_manager import FontProperties
 import matplotlib.font_manager as font_manager
 from copy import copy, deepcopy
@@ -56,7 +58,6 @@ def pick_keywords(texts, exclude_words):
         while node:
             w = node.surface
             w_type = node.feature.split(',')[0]
-            # if (w_type in ["名詞", "動詞", "形容詞"]) & (w not in stopwords):
             if (w_type in ["名詞"]) & (w not in exclude_words):
                 # Nodeの処理
                 if w not in node_name.values():
@@ -84,7 +85,7 @@ def pick_keywords(texts, exclude_words):
     return node_name, node_type, node_count, edge_list, edge_count
 
 
-def gen_network(node_name, node_type, node_count, edge_list, edge_count):
+def gen_network(node_name, node_type, node_count, edge_list, edge_count, date):
     # Networkxに格納
     G = nx.Graph()
     G.add_nodes_from([(idx, {'cnt': node_count[idx]}) for idx in node_name])
@@ -97,7 +98,7 @@ def gen_network(node_name, node_type, node_count, edge_list, edge_count):
     # Node: cnt >= 3で剪定
     # 破壊的操作なので、予め破壊用のグラフ(G2)と検索用グラフ(G)を分けておく
     for n, attr in G.nodes().items():
-        if (attr['cnt'] < 50):
+        if (attr['cnt'] < 30):
             G2.remove_edges_from(list(G.edges(n)))
             G2.remove_node(n)
 
@@ -105,7 +106,7 @@ def gen_network(node_name, node_type, node_count, edge_list, edge_count):
     # Edge: cnt >= 2で剪定
     # Edgeが無くなったNodeは、一旦そのまま
     for e, attr in G2.edges().items():
-        if attr['cnt'] < 50:
+        if attr['cnt'] < 30:
             G3.remove_edge(*e)
 
     G4 = deepcopy(G3)
@@ -120,11 +121,11 @@ def gen_network(node_name, node_type, node_count, edge_list, edge_count):
     pos = nx.layout.spring_layout(G_result, k=0.7)  # 2次元平面状の座標を計算
     labels = {n: node_name[n] for n in pos.keys()}  # Nodeに日本語を描画するための辞書
     # node_size = [np.log(node_count[n])*400 for n in pos.keys()] # 対数スケール
-    node_size = [node_count[n]*30 for n in pos.keys()]
+    node_size = [node_count[n]*10 for n in pos.keys()]
 
     edge_alpha = [edge_count[e] for e in G_result.edges()]
     edge_colors = [edge_count[e] for e in G_result.edges()]
-    edge_width = [edge_count[e] * 0.03 for e in G_result.edges()]
+    edge_width = [edge_count[e] * 0.08 for e in G_result.edges()]
 
     # 描画
     fig, ax = plt.subplots(figsize=(12, 12))
@@ -136,7 +137,7 @@ def gen_network(node_name, node_type, node_count, edge_list, edge_count):
     nx.draw_networkx_nodes(G_result, pos,
                            nodelist=[n for n in G_result.nodes()
                                      if n in node_type["名詞"]],
-                           node_size=node_size, node_color="orange", alpha=0.6, ax=ax)
+                           node_size=node_size, node_color="#f0f0f0", alpha=0.6, ax=ax)
     # nx.draw_networkx_nodes(G_result, pos,
     #                        nodelist=[n for n in G_result.nodes()
     #                                  if n in node_type["動詞"]],
@@ -159,7 +160,8 @@ def gen_network(node_name, node_type, node_count, edge_list, edge_count):
     nx.draw_networkx_labels(G_result, pos, labels, font_size=12,
                             font_family="Yu Gothic", ax=ax)
 
-    plt.savefig("./img/01.png")
+
+    plt.savefig("./img/%s.png" % date)
     # plt.show()
 
 
@@ -168,10 +170,20 @@ def start():
     exclude_words = read_exclude_words()
     ids, dates, texts = read_txt_data()
 
+    # for i, txt in enumerate(texts):
+    #     # print("****")
+    #     # print(txt)
+    #     # print("<br />")
+    #     node_name, node_type, node_count, edge_list, edge_count = pick_keywords(
+    #         txt, exclude_words)
+    #     gen_network(node_name, node_type, node_count,
+    #                 edge_list, edge_count, dates[i])
+
     node_name, node_type, node_count, edge_list, edge_count = pick_keywords(
         texts, exclude_words)
 
-    gen_network(node_name, node_type, node_count, edge_list, edge_count)
+    gen_network(node_name, node_type, node_count,
+                edge_list, edge_count, "test")
 
 
 start()
