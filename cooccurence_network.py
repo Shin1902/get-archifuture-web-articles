@@ -22,7 +22,11 @@ mecab.parse('')
 
 # テキストデータの取得
 def read_txt_data():
+<<<<<<< HEAD
     csv = "../csv/txt_data.csv"
+=======
+    csv = "./csv/txt_data.csv"
+>>>>>>> origin/master
     df = pd.read_csv(csv)
 
     ids = df['id']
@@ -33,7 +37,11 @@ def read_txt_data():
 
 
 def read_exclude_words():  # 除外するワード
+<<<<<<< HEAD
     csv = "../csv/exclude_words.csv"
+=======
+    csv = "./csv/exclude_words.csv"
+>>>>>>> origin/master
     df = pd.read_csv(csv)
 
     exclude_words = df['exclude_words'].reset_index()['index'].tolist()

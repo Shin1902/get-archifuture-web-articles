@@ -3,10 +3,13 @@ import requests
 import pandas as pd
 import datetime
 
+<<<<<<< HEAD
 # 自作APIのインポート
 import write_to_csv
 import preprocessing
 
+=======
+>>>>>>> origin/master
 # ArchiFutureのページをスクレイピング
 
 # initial_scraping()
@@ -33,16 +36,34 @@ def scraping_archifuture_news(url):
         return "page not found"
 
 
+<<<<<<< HEAD
 
+=======
+# csvファイルに追加
+def write_data(id, value):
+    csv_file = 'csv/txt_data.csv'
+    df = pd.read_csv(csv_file)
+
+    date = value[0]
+    text = value[1]
+    results = pd.DataFrame([[id, date, text]], columns=['id', 'date', 'text'])
+
+    df = pd.concat([df, results])
+    df.to_csv(csv_file, index=False)
+    print("success writing to %s" % csv_file)
+>>>>>>> origin/master
 
 
 def start_scraping(id, first_scraping=False):
     # 実行開始時のメッセージ
     now = datetime.datetime.now()
     print("scraping start at %d:%d:%d" % (now.hour, now.minute, now.second))
+<<<<<<< HEAD
     
     # idを文字列から整数に変換
     id = int(id)
+=======
+>>>>>>> origin/master
 
     article_num = 0 # 記事に振られている番号
     scraping_iteration = 0  # 繰り返し処理の回数
@@ -57,6 +78,7 @@ def start_scraping(id, first_scraping=False):
     for i in range(scraping_iteration):
         url = "http://www.archifuture-web.jp/headline/%d.html" % article_num
         return_value = scraping_archifuture_news(url)
+<<<<<<< HEAD
         
         # csvに記述する条件
         file_path = '../csv/txt_data.csv'
@@ -65,6 +87,10 @@ def start_scraping(id, first_scraping=False):
 
         if(return_value != "page not found"):
             write_to_csv.write_data(file_path, key, value)
+=======
+        if(return_value != "page not found"):
+            write_data(id, return_value)
+>>>>>>> origin/master
             added_article += 1
         article_num += 1
 
@@ -78,6 +104,7 @@ def start_scraping(id, first_scraping=False):
         
 
 def check_data():
+<<<<<<< HEAD
     csv_file = '../csv/txt_data.csv'
     df = pd.read_csv(csv_file)
     latest_id = df.tail(1)["id"].reset_index()['id'].tolist()[0]
@@ -85,14 +112,29 @@ def check_data():
         latest_post_id = latest_id    # 最新の記事のURLから記事番号を確認して入力
         start_scraping(latest_post_id, True)
         preprocessing.start()
+=======
+    csv_file = 'csv/txt_data.csv'
+    df = pd.read_csv(csv_file)
+    if len(df) < 1:
+        latest_post_id = 458    # 最新の記事のURLから記事番号を確認して入力
+        start_scraping(latest_post_id, True)
+>>>>>>> origin/master
     else:
         last_article = df.tail(1)
         last_article_id = last_article['id']
         start_scraping(last_article_id)
+<<<<<<< HEAD
         preprocessing.start()
         
 
 
 if __name__ == "__main__":
     check_data()
+=======
+        
+
+
+# if __name__ = "__main__":
+check_data()
+>>>>>>> origin/master
 # initial_scraping()
